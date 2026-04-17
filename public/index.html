@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANDROMEDA</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+</head>
+<body>
+
+  <!-- Title -->
+  <div id="overlay">
+    <div id="title">ANDROMEDA</div>
+    <div id="subtitle">M31 · 2.537 million light-years</div>
+  </div>
+
+  <!-- God messages -->
+  <div id="god-messages"></div>
+
+  <!-- Status -->
+  <div id="status-panel"></div>
+
+  <!-- Toggle button -->
+  <button id="panel-toggle-btn" title="God Controls">⚙</button>
+
+  <!-- Control Panel -->
+  <div id="control-panel" class="hidden">
+    <div id="panel-header">
+      <span>⚡ GOD CONTROLS</span>
+      <button id="panel-close">✕</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PHYSICS</div>
+
+      <div class="control-row">
+        <label>Gravity <span class="val" id="v-gravity">0.00</span></label>
+        <input type="range" id="s-gravity" min="-2" max="2" step="0.01" value="0" />
+      </div>
+      <div class="control-row">
+        <label>Speed <span class="val" id="v-speed">1.5</span></label>
+        <input type="range" id="s-speed" min="0.2" max="6" step="0.1" value="1.5" />
+      </div>
+      <div class="control-row">
+        <label>Connection <span class="val" id="v-conn">120</span></label>
+        <input type="range" id="s-conn" min="20" max="300" step="1" value="120" />
+      </div>
+      <div class="control-row">
+        <label>Fire Rate <span class="val" id="v-fire">0.008</span></label>
+        <input type="range" id="s-fire" min="0.001" max="0.08" step="0.001" value="0.008" />
+      </div>
+      <div class="control-row">
+        <label>Friction <span class="val" id="v-friction">0.98</span></label>
+        <input type="range" id="s-friction" min="0.80" max="0.999" step="0.001" value="0.98" />
+      </div>
+      <div class="control-row">
+        <label>Repulsion <span class="val" id="v-repulsion">0.8</span></label>
+        <input type="range" id="s-repulsion" min="0" max="3" step="0.05" value="0.8" />
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PARTICLES</div>
+      <div class="control-row">
+        <label>Count <span class="val" id="v-count">80</span></label>
+        <input type="range" id="s-count" min="10" max="300" step="1" value="80" />
+      </div>
+      <div class="spawn-row">
+        <button class="event-btn spawn" data-event="spawn" data-count="20">+ SPAWN 20</button>
+        <button class="event-btn kill"  data-event="kill"  data-count="20">− KILL 20</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">DIVINE EVENTS</div>
+      <div class="events-grid">
+        <button class="event-btn pulse"   data-event="pulse">PULSE</button>
+        <button class="event-btn chaos"   data-event="chaos">CHAOS</button>
+        <button class="event-btn harmony" data-event="harmony">HARMONY</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sketch.js"></script>
+  <script src="controls.js"></script>
+</body>
+</html>
