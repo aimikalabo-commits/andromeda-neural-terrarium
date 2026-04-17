@@ -306,36 +306,51 @@ class Particle {
 
   draw() {
     const sz = this.baseSize + this.activation * 2.5;
-    const a  = 150 + this.activation * 90;
+    const a  = 160 + this.activation * 90;
     const r  = this.sr, g = this.sg, b = this.sb;
+    const px = this.pos.x, py = this.pos.y;
 
-    // Subtle star glow when activated
-    if (this.activation > 0.15) {
+    // ── Nova halo glow ────────────────────────────────────────────────────────
+    if (this.activation > 0.08) {
       noStroke();
-      fill(r, g, b, this.activation * 22);
-      ellipse(this.pos.x, this.pos.y, sz * 3.2);
-      fill(r, g, b, this.activation * 40);
-      ellipse(this.pos.x, this.pos.y, sz * 1.8);
+      fill(r, g, b, this.activation * 18); ellipse(px, py, sz * 5);
+      fill(r, g, b, this.activation * 35); ellipse(px, py, sz * 2.5);
     }
-    // Star body
+
+    // ── 4 long diffraction spikes (cross) ────────────────────────────────────
+    if (this.activation > 0.05) {
+      const spikeLen = sz * (2.5 + this.activation * 9);
+      for (let i = 0; i < 4; i++) {
+        const ang = (i / 4) * TWO_PI;
+        stroke(r, g, b, this.activation * 130);
+        strokeWeight(0.6);
+        line(px, py, px + cos(ang) * spikeLen, py + sin(ang) * spikeLen);
+      }
+      // 4 diagonal secondary spikes (shorter)
+      const short = spikeLen * 0.45;
+      for (let i = 0; i < 4; i++) {
+        const ang = (i / 4) * TWO_PI + PI / 4;
+        stroke(r, g, b, this.activation * 65);
+        strokeWeight(0.4);
+        line(px, py, px + cos(ang) * short, py + sin(ang) * short);
+      }
+    }
+
+    // ── Star body ─────────────────────────────────────────────────────────────
     noStroke(); fill(r, g, b, a);
-    ellipse(this.pos.x, this.pos.y, sz);
-    // Bright nucleus
-    fill(255, 255, 255, a * 0.65);
-    ellipse(this.pos.x, this.pos.y, sz * 0.35);
+    ellipse(px, py, sz);
+    fill(255, 255, 255, a * 0.7);
+    ellipse(px, py, sz * 0.35);
   }
 }
 
-// Spawn point along a spiral arm
+// Spawn point in the outer halo — away from the galaxy disk
 function _spiralSpawn() {
-  const arm   = floor(random(2)) * PI;
-  const t     = random(0.05, 1.0);
-  const angle = arm + t * TWO_PI * 2.2;
-  const r     = 30 + t * GW * 0.46;
-  const sc    = random(-GW * 0.06, GW * 0.06);
+  const angle = random(TWO_PI);
+  const r     = random(GW * 0.62, GW * 1.05);
   return {
-    x: GCX + cos(angle) * (r + sc),
-    y: GCY + sin(angle) * (r + sc) * 0.42,
+    x: GCX + cos(angle) * r,
+    y: GCY + sin(angle) * r * 0.55,
   };
 }
 
@@ -609,26 +624,36 @@ function applyInteractions() {
   }
 }
 
-// ─── Draw connections (white/cyan tones, no purple) ───────────────────────────
+// ─── Nova connections — radial rays from source, not full lines ────────────────
 function drawConnections() {
   const cd = physics.connectionDistance;
   for (let i = 0; i < particles.length; i++) {
     const a = particles[i];
+    if (a.activation < 0.05) continue;   // only active particles emit rays
+
     for (let j = i + 1; j < particles.length; j++) {
-      const b = particles[j];
+      const b  = particles[j];
       const dx = b.pos.x - a.pos.x, dy = b.pos.y - a.pos.y;
       const d2 = dx * dx + dy * dy;
       if (d2 < cd * cd) {
         const d   = sqrt(d2);
         const t   = 1 - d / cd;
         const act = (a.activation + b.activation) * 0.5;
-        // Cool white-blue connection colour
-        const rr = lerp(180, 240, act);
-        const gg = lerp(210, 245, act);
-        const bb = lerp(255, 255, act);
-        stroke(rr, gg, bb, t * t * (50 + act * 80));
-        strokeWeight(t * 0.9 + act * 0.5);
-        line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
+        if (act < 0.05) continue;
+
+        // Draw a short ray from the more-active particle toward the other
+        // It only extends 35% of the way — looks like a spike, not a bridge
+        const src  = a.activation >= b.activation ? a : b;
+        const reach = 0.35 + act * 0.20;   // 35-55% of distance
+        const ex   = src.pos.x + (dx / d) * (a.activation >= b.activation ?  1 : -1) * d * reach;
+        const ey   = src.pos.y + (dy / d) * (a.activation >= b.activation ?  1 : -1) * d * reach;
+
+        const rr = lerp(200, 255, act);
+        const gg = lerp(220, 255, act);
+        const bb = 255;
+        stroke(rr, gg, bb, t * act * 160);
+        strokeWeight(0.5 + act * 0.6);
+        line(src.pos.x, src.pos.y, ex, ey);
       }
     }
   }
